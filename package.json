@@ -1,0 +1,30 @@
+{
+"name": "bidbuild-uae",
+"version": "1.0.0",
+"description": "BidBuild UAE - Reverse Auction Platform for Construction Projects",
+"main": "index.js",
+"scripts": {
+"install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+"dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+"dev:backend": "cd backend && npm run dev",
+"dev:frontend": "cd frontend && npm run dev",
+"build": "cd frontend && npm run build",
+"start": "cd backend && npm start",
+"migrate": "cd backend && npm run migrate",
+"test": "concurrently \"cd backend && npm test\" \"cd frontend && npm test\""
+},
+"keywords": [
+"auction",
+"construction",
+"bidding",
+"uae",
+"react",
+"nodejs",
+"mysql"
+],
+"author": "BidBuild UAE Team",
+"license": "MIT",
+"devDependencies": {
+"concurrently": "^8.2.2"
+}
+}
