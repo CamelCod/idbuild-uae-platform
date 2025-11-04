@@ -1,247 +1,93 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { storageService } from '../services/storage'
-import { apiService } from '../services/apiService'
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
-id: string
-firstName: string
-lastName: string
-email: string
-phone: string
-role: 'homeowner' | 'contractor' | 'admin'
-avatar?: string
-isVerified: boolean
-createdAt: string
-lastLogin: string
+  id: string;
+  email: string;
+  role: 'contractor' | 'client' | 'admin';
+  name: string;
+  company?: string;
 }
 
 interface AuthContextType {
-user: User | null
-isAuthenticated: boolean
-isLoading: boolean
-isInitialized: boolean
-initialize: () => Promise<void>
-login: (email: string, password: string) => Promise<{ user: User; token: string; refreshToken: string }>
-logout: () => Promise<void>
-register: (data: any) => Promise<{ user: User; token: string; refreshToken: string }>
-refreshToken: () => Promise<string>
-updateProfile: (data: Partial<User>) => Promise<User>
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  register: (userData: any) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const useAuth = (): AuthContextType => {
-const context = useContext(AuthContext)
-if (context === undefined) {
-throw new Error('useAuth must be used within an AuthProvider')
-}
-return context
-}
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-interface AuthProviderProps {
-children: ReactNode
-}
+  useEffect(() => {
+    // Check for stored auth token
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      // In a real app, we'd validate the token with the backend
+      // For GitHub Pages demo, we'll use mock user data
+      const mockUser: User = {
+        id: '1',
+        email: 'demo@bidbuild.ae',
+        role: 'contractor',
+        name: 'Demo Contractor',
+        company: 'UAE Construction Co.',
+      };
+      setUser(mockUser);
+    }
+    setLoading(false);
+  }, []);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-const [user, setUser] = useState<User | null>(null)
-const [isLoading, setIsLoading] = useState(true)
-const [isInitialized, setIsInitialized] = useState(false)
+  const login = async (email: string, password: string) => {
+    // In a real app, this would call the backend API
+    // For GitHub Pages demo, we'll use mock authentication
+    if (email && password) {
+      const mockUser: User = {
+        id: '1',
+        email,
+        role: 'contractor',
+        name: 'Demo User',
+        company: 'UAE Construction Co.',
+      };
+      setUser(mockUser);
+      localStorage.setItem('auth_token', 'mock_token');
+      navigate('/dashboard');
+    } else {
+      throw new Error('Invalid credentials');
+    }
+  };
 
-const initialize = async (): Promise<void> => {
-try {
-setIsLoading(true)
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('auth_token');
+    navigate('/login');
+  };
 
-const token = storageService.getItem('auth_token')
-const refreshToken = storageService.getItem('refresh_token')
+  const register = async (userData: any) => {
+    // Mock registration
+    console.log('Registering user:', userData);
+    navigate('/login');
+  };
 
-if (token) {
-try {
-// Set token in API service
-apiService.setToken(token)
+  const value = {
+    user,
+    loading,
+    login,
+    logout,
+    register,
+  };
 
-// Verify token and get user data
-const response = await apiService.get('/auth/me')
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
 
-if (response?.data) {
-setUser(response.data)
-}
-} catch (error) {
-// Token is invalid, try to refresh
-if (refreshToken) {
-try {
-const newToken = await refreshToken()
-apiService.setToken(newToken)
-
-const response = await apiService.get('/auth/me')
-if (response?.data) {
-setUser(response.data)
-}
-} catch (refreshError) {
-// Refresh failed, clear tokens
-await logout()
-}
-} else {
-// No refresh token, clear auth data
-await logout()
-}
-}
-}
-} catch (error) {
-console.error('Auth initialization failed:', error)
-} finally {
-setIsLoading(false)
-setIsInitialized(true)
-}
-}
-
-const login = async (email: string, password: string): Promise<{ user: User; token: string; refreshToken: string }> => {
-try {
-const response = await apiService.post('/auth/login', {
-email,
-password
-})
-
-if (response?.data) {
-const { user: userData, accessToken, refreshToken: refreshTokenValue } = response.data
-
-setUser(userData)
-
-// Store tokens
-storageService.setItem('auth_token', accessToken)
-storageService.setItem('refresh_token', refreshTokenValue)
-
-// Set token in API service
-apiService.setToken(accessToken)
-
-return { user: userData, token: accessToken, refreshToken: refreshTokenValue }
-}
-
-throw new Error('Login failed: Invalid response')
-} catch (error: any) {
-console.error('Login failed:', error)
-throw new Error(error.message || 'Login failed')
-}
-}
-
-const logout = async (): Promise<void> => {
-try {
-const refreshToken = storageService.getItem('refresh_token')
-
-if (refreshToken) {
-await apiService.post('/auth/logout', { refreshToken })
-}
-} catch (error) {
-console.error('Logout API call failed:', error)
-} finally {
-// Clear local state and storage regardless of API call success
-setUser(null)
-
-storageService.removeItem('auth_token')
-storageService.removeItem('refresh_token')
-
-apiService.clearToken()
-}
-}
-
-const register = async (data: any): Promise<{ user: User; token: string; refreshToken: string }> => {
-try {
-const response = await apiService.post('/auth/register', data)
-
-if (response?.data) {
-const { user: userData, accessToken, refreshToken: refreshTokenValue } = response.data
-
-setUser(userData)
-
-// Store tokens
-storageService.setItem('auth_token', accessToken)
-storageService.setItem('refresh_token', refreshTokenValue)
-
-// Set token in API service
-apiService.setToken(accessToken)
-
-return { user: userData, token: accessToken, refreshToken: refreshTokenValue }
-}
-
-throw new Error('Registration failed: Invalid response')
-} catch (error: any) {
-console.error('Registration failed:', error)
-throw new Error(error.message || 'Registration failed')
-}
-}
-
-const refreshToken = async (): Promise<string> => {
-try {
-const refreshToken = storageService.getItem('refresh_token')
-
-if (!refreshToken) {
-throw new Error('No refresh token available')
-}
-
-const response = await apiService.post('/auth/refresh', {
-refreshToken
-})
-
-if (response?.data?.accessToken) {
-const newToken = response.data.accessToken
-
-// Update stored token
-storageService.setItem('auth_token', newToken)
-
-// Update API service token
-apiService.setToken(newToken)
-
-return newToken
-}
-
-throw new Error('Token refresh failed: Invalid response')
-} catch (error: any) {
-console.error('Token refresh failed:', error)
-// Clear auth data if refresh fails
-await logout()
-throw error
-}
-}
-
-const updateProfile = async (data: Partial<User>): Promise<User> => {
-try {
-const response = await apiService.put('/auth/profile', data)
-
-if (response?.data) {
-const updatedUser = response.data
-setUser(updatedUser)
-return updatedUser
-}
-
-throw new Error('Profile update failed: Invalid response')
-} catch (error: any) {
-console.error('Profile update failed:', error)
-throw new Error(error.message || 'Profile update failed')
-}
-}
-
-// Initialize auth on mount
-useEffect(() => {
-initialize()
-}, [])
-
-const value: AuthContextType = {
-user,
-isAuthenticated: !!user,
-isLoading,
-isInitialized,
-initialize,
-login,
-logout,
-register,
-refreshToken,
-updateProfile
-}
-
-return (
-<AuthContext.Provider value={value}>
-{children}
-</AuthContext.Provider>
-)
-}
-
-export default AuthContext
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
