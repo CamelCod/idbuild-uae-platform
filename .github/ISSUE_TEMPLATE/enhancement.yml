@@ -1,0 +1,133 @@
+name: 🔧 Enhancement
+description: Suggest an improvement to existing functionality
+title: "[Enhancement]: "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for suggesting an improvement!
+        Use this template to suggest enhancements to existing features.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component needs enhancement?
+      options:
+        - Frontend (React/UI)
+        - Backend (API/Server)
+        - Database Performance
+        - Authentication Flow
+        - Bidding System
+        - Project Management
+        - Real-time Features
+        - Search & Filtering
+        - User Interface/UX
+        - Performance
+        - Security
+        - Documentation
+        - Testing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behavior
+      description: Describe how the feature currently works
+      placeholder: Currently, the system...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed Enhancement
+      description: Describe your proposed improvement
+      placeholder: |
+        I propose to improve this by...
+        This would work by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: What are the benefits of this enhancement?
+      placeholder: |
+        - Improved performance by...
+        - Better user experience through...
+        - Increased security by...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      description: What is the expected impact?
+      options:
+        - High (Affects many users/core functionality)
+        - Medium (Affects some users/important feature)
+        - Low (Affects few users/minor feature)
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation Suggestions
+      description: Do you have ideas on how to implement this?
+      placeholder: |
+        - Step 1: ...
+        - Step 2: ...
+        - Consider using...
+    validations:
+      required: false
+
+  - type: textarea
+    id: breaking
+    attributes:
+      label: Breaking Changes
+      description: Would this enhancement introduce any breaking changes?
+      placeholder: |
+        Yes/No
+        If yes, describe what would break and migration path...
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Considerations
+      description: How should this enhancement be tested?
+      placeholder: |
+        - Unit tests for...
+        - Integration tests for...
+        - Manual testing scenarios...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, code examples, or screenshots
+      placeholder: Any additional information...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have checked that this enhancement doesn't already exist
+          required: true
+        - label: I have considered backward compatibility
+          required: true

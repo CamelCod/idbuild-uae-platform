@@ -1,0 +1,136 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with the BidBuild UAE platform
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for taking the time to report a bug!
+        Please fill out the sections below to help us understand and fix the issue.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of the platform is affected?
+      options:
+        - Frontend (React/UI)
+        - Backend (API/Server)
+        - Database
+        - Authentication
+        - Bidding System
+        - Project Management
+        - Real-time Features (Chat/Notifications)
+        - Deployment/Infrastructure
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe the bug...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: Describe what should happen...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: Describe what actually happened...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (System down/Data loss)
+        - High (Major functionality broken)
+        - Medium (Feature partially broken)
+        - Low (Minor issue/Cosmetic)
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide information about your environment
+      placeholder: |
+        - Browser: [e.g., Chrome 120, Safari 17]
+        - OS: [e.g., Windows 11, macOS 14, iOS 17]
+        - Device: [e.g., Desktop, iPhone 15]
+        - Version/Build: [e.g., v1.0.0]
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: If applicable, paste any error messages or logs
+      placeholder: Paste error logs here...
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem
+      placeholder: Drag and drop images here or paste image URLs
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: Any additional information...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our guidelines
+      options:
+        - label: I have searched for similar issues before creating this one
+          required: true
+        - label: I have provided all the required information
+          required: true
