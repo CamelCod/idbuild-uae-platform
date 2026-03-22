@@ -1,11 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig, AxiosResponse, AxiosError, AxiosDefaults } from 'axios'
 import { ApiResponse, ApiError } from '../types'
 import { storageService } from './storageService'
 import toast from 'react-hot-toast'
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-baseURL: process.env.NODE_ENV === 'production'
+baseURL: import.meta.env.PROD
 ? 'https://api.bidbuild.ae/api'
 : 'http://localhost:5000/api',
 timeout: 30000,
@@ -17,7 +17,7 @@ withCredentials: true,
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-(config: AxiosRequestConfig) => {
+(config: InternalAxiosRequestConfig) => {
 const token = storageService.getToken()
 if (token && config.headers) {
 config.headers.Authorization = `Bearer ${token}`
@@ -35,7 +35,7 @@ api.interceptors.response.use(
 return response
 },
 async (error: AxiosError) => {
-const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
+const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
 
 if (error.response?.status === 401 && !originalRequest._retry) {
 originalRequest._retry = true
@@ -70,7 +70,7 @@ if (error.response?.status === 403) {
 toast.error('You do not have permission to perform this action')
 } else if (error.response?.status === 404) {
 toast.error('The requested resource was not found')
-} else if (error.response?.status >= 500) {
+} else if (error.response?.status !== undefined && error.response.status >= 500) {
 toast.error('Server error. Please try again later')
 }
 
@@ -163,7 +163,7 @@ return this.request<T>('POST', url, formData, {
 headers: {
 'Content-Type': 'multipart/form-data',
 },
-onUploadProgress: (progressEvent) => {
+onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
 if (onProgress && progressEvent.total) {
 const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
 onProgress(progress)
@@ -187,7 +187,7 @@ return this.request<T>('POST', url, formData, {
 headers: {
 'Content-Type': 'multipart/form-data',
 },
-onUploadProgress: (progressEvent) => {
+onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
 if (onProgress && progressEvent.total) {
 const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
 onProgress(progress)
@@ -239,7 +239,7 @@ Object.assign(this.api.defaults.headers, headers)
 }
 
 // Get current configuration
-getConfig(): AxiosRequestConfig {
+getConfig(): AxiosDefaults {
 return this.api.defaults
 }
 }

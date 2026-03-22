@@ -1,5 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 interface User {
   id: string;
@@ -14,7 +13,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (userData: any) => Promise<void>;
+  register: (userData: unknown) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -22,7 +21,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Check for stored auth token
@@ -55,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
       setUser(mockUser);
       localStorage.setItem('auth_token', 'mock_token');
-      navigate('/dashboard');
+      window.location.href = '/dashboard';
     } else {
       throw new Error('Invalid credentials');
     }
@@ -64,13 +62,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('auth_token');
-    navigate('/login');
+    window.location.href = '/login';
   };
 
-  const register = async (userData: any) => {
+  const register = async (userData: unknown) => {
     // Mock registration
     console.log('Registering user:', userData);
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const value = {
